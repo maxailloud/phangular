@@ -7,11 +7,10 @@ import { MainScene } from '@scenes/main.scene';
     templateUrl: 'app.component.html',
 })
 export class AppComponent {
-
     /**
      * Phaser game configuration.
      */
-    readonly gameConfig: GameConfig = {
+    readonly gameConfig: Phaser.Types.Core.GameConfig = {
         type: Phaser.WEBGL,
         width: 800,
         height: 600,
@@ -27,8 +26,6 @@ export class AppComponent {
 
     /**
      * On game ready event handler. Fired once Phaser game is ready and Angular view is initialized.
-     *
-     * @param {Phaser.Game} game
      */
     onGameReady(game: Phaser.Game): void {
         this.game = game;
