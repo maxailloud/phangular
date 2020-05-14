@@ -44,6 +44,7 @@ export class RenderingProcessor implements ProcessorInterface {
 
     public update(deltaTime: number): void {
         const displayables: DisplayableSet[] = this.entityManager.getComponentsData(DisplayableComponent.NAME);
+        console.log(displayables);
 
         displayables.forEach((displayable, entityId) => {
             if (this.entityManager.entityHasComponent(entityId, SpriteComponent.NAME)) {

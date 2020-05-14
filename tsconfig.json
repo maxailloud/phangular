@@ -15,10 +15,10 @@
             "esnext"
         ],
         "paths": {
-            "@scenes/*": ["app/app/scenes/*"],
-            "@components/*": ["app/app/components/*"],
-            "@data-set/*": ["app/app/data-set/*"],
-            "@processors/*": ["app/app/processors/*"]
+            "@scenes/*": ["app/scenes/*"],
+            "@components/*": ["app/components/*"],
+            "@data-set/*": ["app/data-set/*"],
+            "@processors/*": ["app/processors/*"]
         }
     }
 }

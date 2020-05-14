@@ -1,53 +1,41 @@
 {
-  "name": "phaser-project-template",
-  "version": "3.22.0",
-  "description": "Phaser 3 starter template with TypeScript and webpack.",
-  "homepage": "https://github.com/yandeu/phaser-project-template#readme",
-  "main": "index.js",
-  "scripts": {
-    "start": "webpack-dev-server --config webpack/webpack.dev.js",
-    "build": "webpack --config webpack/webpack.prod.js"
-  },
-  "keywords": [
-    "Phaser",
-    "Phaser 3",
-    "Phaser3",
-    "html5 game",
-    "TypeScript",
-    "webpack",
-    "starter"
-  ],
-  "author": {
-    "name": "Yannick Deubel",
-    "url": "https://github.com/yandeu"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/yandeu/phaser-project-template.git"
-  },
-  "template": {
-    "name": "phaser-project-template",
-    "url": "https://github.com/yandeu/phaser-project-template",
-    "author": "Yannick Deubel (https://github.com/yandeu)"
-  },
-  "engines": {
-    "node": ">=8.0.0"
-  },
-  "license": "MIT",
-  "devDependencies": {
-    "clean-webpack-plugin": "^3.0.0",
-    "copy-webpack-plugin": "^5.1.1",
-    "html-webpack-plugin": "^3.2.0",
-    "ts-loader": "^5.4.5",
-    "typescript": "^3.8.3",
-    "webpack": "^4.42.1",
-    "webpack-cli": "^3.3.11",
-    "webpack-dev-server": "^3.10.3",
-    "webpack-merge": "^4.2.2",
-    "webpack-obfuscator": "^0.27.4",
-    "workbox-webpack-plugin": "^5.1.2"
-  },
-  "dependencies": {
-    "phaser": "^3.22.0"
-  }
+    "name": "nothing-to-sea",
+    "version": "0.0.0",
+    "description": "Phaser 3 project with TypeScript and webpack.",
+    "main": "index.js",
+    "scripts": {
+        "start": "webpack-dev-server --config webpack/webpack.dev.ts",
+        "build": "webpack --config webpack/webpack.prod.ts"
+    },
+    "author": {
+        "name": "Maxime Ailloud",
+        "url": "https://github.com/maxailloud"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/maxailloud/phangular"
+    },
+    "private": true,
+    "devDependencies": {
+        "@types/node": "^14.0.1",
+        "@types/webpack": "^4.41.13",
+        "@types/webpack-dev-server": "^3.10.1",
+        "clean-webpack-plugin": "^3.0.0",
+        "copy-webpack-plugin": "^5.1.1",
+        "html-webpack-plugin": "^3.2.0",
+        "ts-loader": "^5.4.5",
+        "ts-node": "^8.10.1",
+        "tsconfig-paths-webpack-plugin": "^3.2.0",
+        "typescript": "^3.9.2",
+        "webpack": "^4.42.1",
+        "webpack-cli": "^3.3.11",
+        "webpack-dev-server": "^3.10.3",
+        "webpack-merge": "^4.2.2",
+        "webpack-obfuscator": "^0.27.4",
+        "workbox-webpack-plugin": "^5.1.2"
+    },
+    "dependencies": {
+        "ensy": "^1.5.0",
+        "phaser": "^3.22.0"
+    }
 }

@@ -1,7 +1,6 @@
 import 'phaser';
 import { LoadingScene } from '@scenes/loading.scene';
-import MainScene from './scenes/main-scene';
-import PreloadScene from './scenes/preload-scene';
+import { MainScene } from '@scenes/main.scene';
 
 const DEFAULT_WIDTH = 1280;
 const DEFAULT_HEIGHT = 720;
@@ -11,7 +10,7 @@ const config: Phaser.Types.Core.GameConfig = {
     backgroundColor: '#FFFFFF',
     autoFocus: true,
     url: 'http//url.to.game',
-    title: 'Phangular',
+    title: 'Nothing To Sea',
     version: '0.0.1',
     scale: {
         parent: 'phaser-game',
@@ -20,7 +19,6 @@ const config: Phaser.Types.Core.GameConfig = {
         width: DEFAULT_WIDTH,
         height: DEFAULT_HEIGHT
     },
-    scene: [PreloadScene, MainScene],
     physics: {
         default: 'arcade',
         arcade: {
@@ -32,6 +30,6 @@ const config: Phaser.Types.Core.GameConfig = {
 
 window.addEventListener('load', () => {
     const game = new Phaser.Game(config);
-    //game.scene.add(MainScene.KEY, MainScene);
-    //game.scene.add(LoadingScene.KEY, LoadingScene, true);
+    game.scene.add(MainScene.KEY, MainScene);
+    game.scene.add(LoadingScene.KEY, LoadingScene, true);
 });
