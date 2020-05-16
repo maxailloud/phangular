@@ -15,7 +15,7 @@ declare module 'ensy'  {
 
     export interface Assemblage {
         components: string[];
-        initialState: { [componentId: string]: any };
+        initialState: { [componentId: string]: Component<any> };
     }
 
     export class EntityManager {
@@ -52,10 +52,10 @@ declare module 'ensy'  {
          * Add a component to the list of known components.
          *
          * @param {string} id Unique identifier of the component.
-         * @param {object} component object containing the metadata and data of the component.
+         * @param {Component<any>} component object containing the metadata and data of the component.
          * @returns {EntityManager} this
          */
-        addComponent(id: string, component: any): EntityManager;
+        addComponent(id: string, component: Component<any>): EntityManager;
 
         /**
          * Remove a component from the list of known components.
@@ -68,9 +68,9 @@ declare module 'ensy'  {
         /**
          * Get the list of components this instance knows.
          *
-         * @return {any[]} List of names of components.
+         * @return {string[]} List of names of components.
          */
-        getComponentsList(): any[];
+        getComponentsList(): string[];
 
         /**
          * Create a new instance of each listed component and associate them with the entity.
@@ -104,7 +104,7 @@ declare module 'ensy'  {
          *
          * @param {string} componentId Unique identifier of the component.
          * @param {number} entityId Unique identifier of the entity.
-         * @param {any} newState object containing the new state to apply.
+         * @param {BaseComponent<any>} newState object containing the new state to apply.
          * @return {EntityManager} EntityManager
          */
         updateComponentDataForEntity(componentId: string, entityId: number, newState: any): EntityManager;
