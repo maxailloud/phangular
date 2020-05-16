@@ -43,10 +43,11 @@ export class RenderingProcessor implements ProcessorInterface {
     }
 
     public update(deltaTime: number): void {
-        const displayables: DisplayableSet[] = this.entityManager.getComponentsData(DisplayableComponent.NAME);
-        console.log(displayables);
+        const displayables = this.entityManager.getComponentsData<DisplayableSet>(DisplayableComponent.NAME);
 
-        displayables.forEach((displayable, entityId) => {
+        Object.entries(displayables).forEach(([stringEntityId, displayable]) => {
+            const entityId = +stringEntityId;
+
             if (this.entityManager.entityHasComponent(entityId, SpriteComponent.NAME)) {
                 this.createSprite(entityId);
             } else if (this.entityManager.entityHasComponent(entityId, ImageComponent.NAME)) {
