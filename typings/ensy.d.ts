@@ -14,6 +14,7 @@ declare module 'ensy'  {
     }
 
     export interface Assemblage {
+        name: string;
         components: string[];
         initialState: { [componentId: string]: Component<any> };
     }
@@ -56,6 +57,16 @@ declare module 'ensy'  {
          * @returns {EntityManager} this
          */
         addComponent(id: string, component: Component<any>): EntityManager;
+
+        /**
+         * Add a list of components to known components.
+         *
+         * @param {Array} components - Array of objects containing the metadata and
+         * data of components. Requires that each object has `name` used to identify
+         * it, and `data` to describe it.
+         * @return {object} - this
+         */
+        addComponents(component: Component<any>[]): EntityManager;
 
         /**
          * Remove a component from the list of known components.
@@ -136,6 +147,15 @@ declare module 'ensy'  {
         addAssemblage(id: string, assemblage: Assemblage): EntityManager;
 
         /**
+         * Add a list of assemblages to known assemblages.
+         *
+         * @param {Array} assemblages - An array of assemblages to add. Require that
+         * each object has a `name` property to use as identifier.
+         * @return {object} - this
+         */
+        addAssemblages(assemblages: Assemblage[]): EntityManager;
+
+        /**
          * Remove an assemblage from the list of known assemblages.
          *
          * @param {string} id Unique identifier of the assemblage.
@@ -162,6 +182,14 @@ declare module 'ensy'  {
          * @return {EntityManager} this
          */
         addProcessor(processor: ProcessorInterface): EntityManager;
+
+        /**
+         * Add a list of processors to known processors.
+         *
+         * @param {Array} processors - An array of processors to manage.
+         * @return {object} - this
+         */
+        addProcessors(processors: ProcessorInterface[]): EntityManager
 
         /**
          * Remove a processor from the list of known processors.
