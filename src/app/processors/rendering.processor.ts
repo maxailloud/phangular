@@ -42,38 +42,83 @@ export class RenderingProcessor implements ProcessorInterface {
         this.nonGameObjects = [];
     }
 
+    public on(type: string, data: {entity: number, component: string, state: {[key: string]: any}}) {
+        switch (type) {
+            case 'COMPONENT_CREATED':
+                const entityId = data.entity;
+
+                switch(data.component) {
+                    case SpriteComponent.NAME:
+                        this.createSprite(entityId);
+                        break;
+                    case ImageComponent.NAME:
+                        this.createImage(entityId);
+
+                        if (this.entityManager.entityHasComponent(entityId, BounceComponent.NAME)) {
+                            this.setArcadeImageBounce(this.gameObjects[entityId] as Phaser.Physics.Arcade.Image, entityId);
+                        }
+                        break;
+                    case VelocityComponent.NAME:
+                        if (this.entityManager.entityHasComponent(entityId, ImageComponent.NAME)) {
+                            this.setArcadeImageVelocity(this.gameObjects[entityId] as Phaser.Physics.Arcade.Image, entityId);
+                        }
+                        break;
+                    case BounceComponent.NAME:
+                        if (this.entityManager.entityHasComponent(entityId, ImageComponent.NAME)) {
+                            this.setArcadeImageBounce(this.gameObjects[entityId] as Phaser.Physics.Arcade.Image, entityId);
+                        }
+                        break;
+                    case TextComponent.NAME:
+                        this.createText(entityId);
+                        break;
+                    case ParticleEmitterManagerComponent.NAME:
+                        this.createParticleEmitterManager(entityId);
+                        break;
+                    case ParticleEmitterComponent.NAME:
+                        this.createParticleEmitter(entityId);
+                        break;
+                    case GraphicsComponent.NAME:
+                        this.createGraphics(entityId);
+                        break;
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
     public update(deltaTime: number): void {
         const displayables = this.entityManager.getComponentsData<DisplayableSet>(DisplayableComponent.NAME);
 
         Object.entries(displayables).forEach(([stringEntityId, displayable]) => {
             const entityId = +stringEntityId;
 
-            if (this.entityManager.entityHasComponent(entityId, SpriteComponent.NAME)) {
-                this.createSprite(entityId);
-            } else if (this.entityManager.entityHasComponent(entityId, ImageComponent.NAME)) {
-                if (!this.isGameObjectExistsForEntity(entityId)) {
-                    this.createImage(entityId);
-
-                    if (this.entityManager.entityHasComponent(entityId, VelocityComponent.NAME)) {
-                        this.setArcadeImageVelocity(this.gameObjects[entityId] as Phaser.Physics.Arcade.Image, entityId);
-                    }
-
-                    if (this.entityManager.entityHasComponent(entityId, BounceComponent.NAME)) {
-                        this.setArcadeImageBounce(this.gameObjects[entityId] as Phaser.Physics.Arcade.Image, entityId);
-                    }
-                }
-            } else if (this.entityManager.entityHasComponent(entityId, TextComponent.NAME)) {
-                this.createOrUpdateText(entityId);
-            } else if (this.entityManager.entityHasComponent(entityId, ParticleEmitterManagerComponent.NAME)) {
-                this.createParticleEmitterManager(entityId);
-            } else if (this.entityManager.entityHasComponent(entityId, ParticleEmitterComponent.NAME)) {
-                this.createParticleEmitter(entityId);
-            } else if (this.entityManager.entityHasComponent(entityId, GraphicsComponent.NAME)) {
-                this.createGraphics(entityId);
-            }
-
             this.updateGameObject(displayable, entityId);
             this.updateNonGameObject(displayable, entityId);
+        });
+
+        const texts = this.entityManager.getComponentsData<TextSet>(TextComponent.NAME);
+
+        Object.entries(texts).forEach(([stringEntityId, textSet]) => {
+            const entityId = +stringEntityId;
+
+            this.updateText(entityId, textSet);
+        });
+
+        const graphics = this.entityManager.getComponentsData<GraphicsSet>(GraphicsComponent.NAME);
+
+        Object.entries(graphics).forEach(([stringEntityId, graphicsSet]) => {
+            const entityId = +stringEntityId;
+
+            this.updateGraphics(entityId, graphicsSet);
+        });
+
+        const images = this.entityManager.getComponentsData<ImageSet>(ImageComponent.NAME);
+
+        Object.entries(images).forEach(([stringEntityId, imageSet]) => {
+            const entityId = +stringEntityId;
+
+            this.updateImage(entityId, imageSet);
         });
     }
 
@@ -106,28 +151,34 @@ export class RenderingProcessor implements ProcessorInterface {
     }
 
     private createSprite(entityId: number) {
-        if (!this.isGameObjectExistsForEntity(entityId)) {
-            const positionData: PositionSet = this.entityManager.getComponentDataForEntity(PositionComponent.NAME, entityId);
-            const spriteData: SpriteSet = this.entityManager.getComponentDataForEntity(SpriteComponent.NAME, entityId);
+        const positionData: PositionSet = this.entityManager.getComponentDataForEntity(PositionComponent.NAME, entityId);
+        const spriteData: SpriteSet = this.entityManager.getComponentDataForEntity(SpriteComponent.NAME, entityId);
 
-            this.gameObjects[entityId] = this.scene.add.sprite(positionData.x, positionData.y, spriteData.texture);
-        }
+        this.gameObjects[entityId] = this.scene.add.sprite(positionData.x, positionData.y, spriteData.texture);
     }
 
     private createImage(entityId: number) {
-        if (!this.isGameObjectExistsForEntity(entityId)) {
-            const positionData: PositionSet = this.entityManager.getComponentDataForEntity(PositionComponent.NAME, entityId);
-            const imageData: ImageSet = this.entityManager.getComponentDataForEntity(ImageComponent.NAME, entityId);
+        const positionData: PositionSet = this.entityManager.getComponentDataForEntity(PositionComponent.NAME, entityId);
+        const imageData: ImageSet = this.entityManager.getComponentDataForEntity(ImageComponent.NAME, entityId);
 
-            let image;
+        let image;
 
-            if (this.entityManager.entityHasComponent(entityId, ArcadeComponent.NAME)) {
-                image = this.scene.physics.add.image(positionData.x, positionData.y, imageData.texture);
-            } else {
-                image = this.scene.add.image(positionData.x, positionData.y, imageData.texture);
-            }
+        if (this.entityManager.entityHasComponent(entityId, ArcadeComponent.NAME)) {
+            image = this.scene.physics.add.image(positionData.x, positionData.y, imageData.texture);
+        } else {
+            image = this.scene.add.image(positionData.x, positionData.y, imageData.texture);
+        }
 
-            this.gameObjects[entityId] = image;
+        this.gameObjects[entityId] = image;
+    }
+
+    private updateImage(entityId: number, imageSet: ImageSet) {
+        if (this.entityManager.entityHasComponent(entityId, ArcadeComponent.NAME)) {
+            let image = this.gameObjects[entityId] as Phaser.Physics.Arcade.Image;
+            image.setTexture(imageSet.texture);
+        } else {
+            let image = this.gameObjects[entityId] as Phaser.GameObjects.Image;
+            image.setTexture(imageSet.texture);
         }
     }
 
@@ -144,119 +195,112 @@ export class RenderingProcessor implements ProcessorInterface {
         gameObject.setCollideWorldBounds(bounceData.collide);
     }
 
-    private createOrUpdateText(entityId: number) {
+    private createText(entityId: number) {
         const textSet: TextSet = this.entityManager.getComponentDataForEntity(TextComponent.NAME, entityId);
+        const posData = this.entityManager.getComponentDataForEntity(PositionComponent.NAME, entityId);
+        const style = {
+            fontFamily: textSet.fontFamily,
+            fontSize: textSet.fontSize,
+            align: textSet.align,
+        };
+        this.gameObjects[entityId] = this.scene.add.text(posData.x, posData.y, textSet.text, style);
 
-        if (!this.isGameObjectExistsForEntity(entityId)) {
-            const posData = this.entityManager.getComponentDataForEntity(PositionComponent.NAME, entityId);
+        if (this.entityManager.entityHasComponent(entityId, OriginComponent.NAME)) {
+            const originSet: OriginSet = this.entityManager.getComponentDataForEntity(OriginComponent.NAME, entityId);
 
-            const style = {
-                fontFamily: textSet.fontFamily,
-                fontSize: textSet.fontSize,
-                align: textSet.align,
-            };
-            this.gameObjects[entityId] = this.scene.add.text(posData.x, posData.y, textSet.text, style);
-
-            if (this.entityManager.entityHasComponent(entityId, OriginComponent.NAME)) {
-                const originSet: OriginSet = this.entityManager.getComponentDataForEntity(OriginComponent.NAME, entityId);
-
-                const text = this.gameObjects[entityId] as Phaser.GameObjects.Text;
-
-                text.setOrigin(originSet.x, originSet.y);
-            }
-        } else {
             const text = this.gameObjects[entityId] as Phaser.GameObjects.Text;
 
-            if (text.text !== textSet.text) {
-                text.setText(textSet.text);
-            }
+            text.setOrigin(originSet.x, originSet.y);
+        }
+    }
+
+    private updateText(entityId: number, textSet: TextSet) {
+        const text = this.gameObjects[entityId] as Phaser.GameObjects.Text;
+
+        if (text.text !== textSet.text) {
+            text.setText(textSet.text);
         }
     }
 
     private createParticleEmitterManager(entityId: number) {
-        if (!this.isGameObjectExistsForEntity(entityId)) {
-            const particleEmitterManagerSet: ParticleEmitterManagerSet = this.entityManager
-                .getComponentDataForEntity(ParticleEmitterManagerComponent.NAME, entityId);
+        const particleEmitterManagerSet: ParticleEmitterManagerSet = this.entityManager
+            .getComponentDataForEntity(ParticleEmitterManagerComponent.NAME, entityId);
 
-            this.gameObjects[entityId] = this.scene.add.particles(particleEmitterManagerSet.texture);
-        }
+        this.gameObjects[entityId] = this.scene.add.particles(particleEmitterManagerSet.texture);
     }
 
     private createParticleEmitter(entityId: number) {
-        if (!this.isNonGameObjectExistsForEntity(entityId)) {
-            const particleEmitterSet: ParticleEmitterSet = this.entityManager
-                .getComponentDataForEntity(ParticleEmitterComponent.NAME, entityId);
+        const particleEmitterSet: ParticleEmitterSet = this.entityManager
+            .getComponentDataForEntity(ParticleEmitterComponent.NAME, entityId);
 
-            const particleEmitterManager = this.gameObjects[particleEmitterSet.manager] as
-                Phaser.GameObjects.Particles.ParticleEmitterManager;
+        const particleEmitterManager = this.gameObjects[particleEmitterSet.manager] as
+            Phaser.GameObjects.Particles.ParticleEmitterManager;
 
-            if (particleEmitterManager) {
-                let particleEmitter;
+        if (particleEmitterManager) {
+            let particleEmitter;
 
-                if (this.entityManager.entityHasComponent(entityId, PositionComponent.NAME)) {
-                    const positionSet: PositionSet = this.entityManager
-                        .getComponentDataForEntity(PositionComponent.NAME, entityId);
+            if (this.entityManager.entityHasComponent(entityId, PositionComponent.NAME)) {
+                const positionSet: PositionSet = this.entityManager
+                    .getComponentDataForEntity(PositionComponent.NAME, entityId);
 
-                    particleEmitter = particleEmitterManager.createEmitter({
-                        x: positionSet.x,
-                        y: positionSet.y,
-                        speed: particleEmitterSet.speed,
-                        // blendMode: particleEmitterSet.blendMode
-                    });
-                } else if (this.entityManager.entityHasComponent(entityId, ParticleEmitterFollowingComponent.NAME)) {
-                    const particleEmitterFollowingSet: ParticleEmitterFollowingSet = this.entityManager
-                        .getComponentDataForEntity(ParticleEmitterFollowingComponent.NAME, entityId);
+                particleEmitter = particleEmitterManager.createEmitter({
+                    x: positionSet.x,
+                    y: positionSet.y,
+                    speed: particleEmitterSet.speed,
+                    blendMode: particleEmitterSet.blendMode
+                });
+            } else if (this.entityManager.entityHasComponent(entityId, ParticleEmitterFollowingComponent.NAME)) {
+                const particleEmitterFollowingSet: ParticleEmitterFollowingSet = this.entityManager
+                    .getComponentDataForEntity(ParticleEmitterFollowingComponent.NAME, entityId);
 
-                    particleEmitter = particleEmitterManager.createEmitter({
-                        speed: particleEmitterSet.speed,
-                        scale: particleEmitterSet.scale,
-                        // blendMode: particleEmitterSet.blendMode
-                    });
+                particleEmitter = particleEmitterManager.createEmitter({
+                    speed: particleEmitterSet.speed,
+                    scale: particleEmitterSet.scale,
+                    blendMode: particleEmitterSet.blendMode
+                });
 
-                    if (!this.isGameObjectExistsForEntity(particleEmitterFollowingSet.following)) {
-                        throw new Error('Unable to find following game object for the particle emitter.');
-                    } else {
-                        particleEmitter.startFollow(this.gameObjects[particleEmitterFollowingSet.following]);
-                    }
+                if (!this.isGameObjectExistsForEntity(particleEmitterFollowingSet.following)) {
+                    throw new Error('Unable to find following game object for the particle emitter.');
                 } else {
-                    throw new Error('To create a particle emitter you must at least set one of the following component on your entity: ' +
-                        'Position, ParticleEmitterFollowing.');
+                    particleEmitter.startFollow(this.gameObjects[particleEmitterFollowingSet.following]);
                 }
+            } else {
+                throw new Error('To create a particle emitter you must at least set one of the following component on your entity: ' +
+                    'Position, ParticleEmitterFollowing.');
+            }
 
-                if (particleEmitter) {
-                    this.nonGameObjects[entityId] = particleEmitter;
-                }
+            if (particleEmitter) {
+                this.nonGameObjects[entityId] = particleEmitter;
             }
         }
     }
 
     private createGraphics(entityId: number) {
-        if (!this.isGameObjectExistsForEntity(entityId)) {
-            const graphicsSet: GraphicsSet = this.entityManager.getComponentDataForEntity(GraphicsComponent.NAME, entityId);
-            const positionSet: PositionSet = this.entityManager.getComponentDataForEntity(PositionComponent.NAME, entityId);
-            const sizeSet: SizeSet = this.entityManager.getComponentDataForEntity(SizeComponent.NAME, entityId);
+        const graphicsSet: GraphicsSet = this.entityManager.getComponentDataForEntity(GraphicsComponent.NAME, entityId);
+        const positionSet: PositionSet = this.entityManager.getComponentDataForEntity(PositionComponent.NAME, entityId);
+        const sizeSet: SizeSet = this.entityManager.getComponentDataForEntity(SizeComponent.NAME, entityId);
 
-            const newGraphics = this.scene.add.graphics();
-            newGraphics.fillStyle(graphicsSet.fillColor, graphicsSet.fillAlpha);
+        const newGraphics = this.scene.add.graphics();
+        newGraphics.fillStyle(graphicsSet.fillColor, graphicsSet.fillAlpha);
 
-            if (graphicsSet.fill === 'rect') {
-                newGraphics.fillRect(positionSet.x, positionSet.y, sizeSet.width, sizeSet.height);
-            }
+        if (graphicsSet.fill === 'rect') {
+            newGraphics.fillRect(positionSet.x, positionSet.y, sizeSet.width, sizeSet.height);
+        }
 
-            this.gameObjects[entityId] = newGraphics;
-        } else {
-            const graphicsSet: GraphicsSet = this.entityManager.getComponentDataForEntity(GraphicsComponent.NAME, entityId);
-            const positionSet: PositionSet = this.entityManager.getComponentDataForEntity(PositionComponent.NAME, entityId);
-            const sizeSet: SizeSet = this.entityManager.getComponentDataForEntity(SizeComponent.NAME, entityId);
+        this.gameObjects[entityId] = newGraphics;
+    }
 
-            const graphics = this.gameObjects[entityId] as Phaser.GameObjects.Graphics;
+    private updateGraphics(entityId: number, graphicsSet: GraphicsSet) {
+        const positionSet: PositionSet = this.entityManager.getComponentDataForEntity(PositionComponent.NAME, entityId);
+        const sizeSet: SizeSet = this.entityManager.getComponentDataForEntity(SizeComponent.NAME, entityId);
 
-            graphics.clear();
-            graphics.fillStyle(graphicsSet.fillColor, graphicsSet.fillAlpha);
+        const graphics = this.gameObjects[entityId] as Phaser.GameObjects.Graphics;
 
-            if (graphicsSet.fill === 'rect') {
-                graphics.fillRect(positionSet.x, positionSet.y, sizeSet.width, sizeSet.height);
-            }
+        graphics.clear();
+        graphics.fillStyle(graphicsSet.fillColor, graphicsSet.fillAlpha);
+
+        if (graphicsSet.fill === 'rect') {
+            graphics.fillRect(positionSet.x, positionSet.y, sizeSet.width, sizeSet.height);
         }
     }
 }
