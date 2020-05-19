@@ -6,7 +6,7 @@ export class ParticleEmitterComponent extends BaseComponent<ParticleEmitterSet> 
 
     constructor() {
         super(ParticleEmitterComponent.NAME, {
-            manager: 0,
+            manager: undefined,
             speed: 100,
             scale: {start: 1, end: 0},
             blendMode: Phaser.BlendModes.ADD

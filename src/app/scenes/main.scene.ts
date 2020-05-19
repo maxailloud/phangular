@@ -55,40 +55,40 @@ export class MainScene extends BaseScene {
             y: 200,
         });
 
-        //const redParticleEmitterManagerEntityId = this.entityManager.createEntity([DisplayableComponent.NAME,
-        //    ParticleEmitterManagerComponent.NAME]);
-        //this.entityManager.updateComponentDataForEntity(ParticleEmitterManagerComponent.NAME, redParticleEmitterManagerEntityId, {
-        //    texture: 'red',
-        //});
-        //
-        //const redParticleEmitterEntityId = this.entityManager.createEntity([DisplayableComponent.NAME, ParticleEmitterComponent.NAME,
-        //    ParticleEmitterFollowingComponent.NAME]);
-        //this.entityManager.updateComponentDataForEntity(ParticleEmitterComponent.NAME, redParticleEmitterEntityId, {
-        //    manager: redParticleEmitterManagerEntityId,
-        //    speed: 100,
-        //    scale: {start: 1, end: 0},
-        //    blendMode: Phaser.BlendModes.ADD,
-        //});
-        //this.entityManager.updateComponentDataForEntity(ParticleEmitterFollowingComponent.NAME, redParticleEmitterEntityId, {
-        //    following: logoEntityId,
-        //});
-        //
-        //const blueParticleEmitterManagerEntityId = this.entityManager.createEntity([DisplayableComponent.NAME, PositionComponent.NAME,
-        //    ParticleEmitterManagerComponent.NAME]);
-        //this.entityManager.updateComponentDataForEntity(ParticleEmitterManagerComponent.NAME, blueParticleEmitterManagerEntityId, {
-        //    texture: 'blue',
-        //});
-        //
-        //const blueParticleEmitterEntityId = this.entityManager.createEntity([DisplayableComponent.NAME, ParticleEmitterComponent.NAME,
-        //    PositionComponent.NAME]);
-        //this.entityManager.updateComponentDataForEntity(PositionComponent.NAME, blueParticleEmitterEntityId, {
-        //    x: 400,
-        //    y: 300,
-        //});
-        //this.entityManager.updateComponentDataForEntity(ParticleEmitterComponent.NAME, blueParticleEmitterEntityId, {
-        //    manager: blueParticleEmitterManagerEntityId,
-        //    speed: 200,
-        //    blendMode: Phaser.BlendModes.ADD,
-        //});
+        const redParticleEmitterManagerEntityId = this.entityManager.createEntity([DisplayableComponent.NAME,
+            ParticleEmitterManagerComponent.NAME]);
+        this.entityManager.updateComponentDataForEntity(ParticleEmitterManagerComponent.NAME, redParticleEmitterManagerEntityId, {
+            texture: 'red',
+        });
+
+        const redParticleEmitterEntityId = this.entityManager.createEntity([DisplayableComponent.NAME, ParticleEmitterComponent.NAME,
+            ParticleEmitterFollowingComponent.NAME]);
+        this.entityManager.updateComponentDataForEntity(ParticleEmitterComponent.NAME, redParticleEmitterEntityId, {
+            manager: redParticleEmitterManagerEntityId,
+            speed: 100,
+            scale: {start: 1, end: 0},
+            blendMode: Phaser.BlendModes.ADD,
+        });
+        this.entityManager.updateComponentDataForEntity(ParticleEmitterFollowingComponent.NAME, redParticleEmitterEntityId, {
+            following: logoEntityId,
+        });
+
+        const blueParticleEmitterManagerEntityId = this.entityManager.createEntity([DisplayableComponent.NAME, PositionComponent.NAME,
+            ParticleEmitterManagerComponent.NAME]);
+        this.entityManager.updateComponentDataForEntity(ParticleEmitterManagerComponent.NAME, blueParticleEmitterManagerEntityId, {
+            texture: 'blue',
+        });
+
+        const blueParticleEmitterEntityId = this.entityManager.createEntity([DisplayableComponent.NAME, ParticleEmitterComponent.NAME,
+            PositionComponent.NAME]);
+        this.entityManager.updateComponentDataForEntity(PositionComponent.NAME, blueParticleEmitterEntityId, {
+            x: 400,
+            y: 300,
+        });
+        this.entityManager.updateComponentDataForEntity(ParticleEmitterComponent.NAME, blueParticleEmitterEntityId, {
+            manager: blueParticleEmitterManagerEntityId,
+            speed: 200,
+            blendMode: Phaser.BlendModes.ADD,
+        });
     }
 }

@@ -1,5 +1,5 @@
 export interface ParticleEmitterSet {
-    manager: number;
+    manager?: number;
     speed: number;
     scale: {
         start: 1,

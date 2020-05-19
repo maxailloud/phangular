@@ -74,6 +74,7 @@ export class RenderingProcessor implements ProcessorInterface {
                     case ParticleEmitterManagerComponent.NAME:
                         this.createParticleEmitterManager(entityId);
                         break;
+                    // Uncomment when it's possible to have an initial state for an entity
                     case ParticleEmitterComponent.NAME:
                         this.createParticleEmitter(entityId);
                         break;
@@ -119,6 +120,22 @@ export class RenderingProcessor implements ProcessorInterface {
             const entityId = +stringEntityId;
 
             this.updateImage(entityId, imageSet);
+        });
+
+        const particleEmitterManagers = this.entityManager.getComponentsData<ParticleEmitterManagerSet>(ParticleEmitterManagerComponent.NAME);
+
+        Object.entries(particleEmitterManagers).forEach(([stringEntityId, particlerEmitterManagerSet]) => {
+            const entityId = +stringEntityId;
+
+            this.updateParticleEmitterManager(entityId, particlerEmitterManagerSet);
+        });
+
+        const particleEmitters = this.entityManager.getComponentsData<ParticleEmitterSet>(ParticleEmitterComponent.NAME);
+
+        Object.entries(particleEmitters).forEach(([stringEntityId, particlerEmitterSet]) => {
+            const entityId = +stringEntityId;
+
+            this.updateParticleEmitter(entityId, particlerEmitterSet);
         });
     }
 
@@ -229,35 +246,92 @@ export class RenderingProcessor implements ProcessorInterface {
         this.gameObjects[entityId] = this.scene.add.particles(particleEmitterManagerSet.texture);
     }
 
+    private updateParticleEmitterManager(entityId: number, particleEmitterManagerSet: ParticleEmitterManagerSet) {
+        const particleEmitterManager = this.gameObjects[entityId] as
+            Phaser.GameObjects.Particles.ParticleEmitterManager;
+
+        particleEmitterManager.setTexture(particleEmitterManagerSet.texture);
+    }
+
     private createParticleEmitter(entityId: number) {
         const particleEmitterSet: ParticleEmitterSet = this.entityManager
             .getComponentDataForEntity(ParticleEmitterComponent.NAME, entityId);
+        this.getParticleEmitter(entityId, particleEmitterSet);
+    }
 
-        const particleEmitterManager = this.gameObjects[particleEmitterSet.manager] as
-            Phaser.GameObjects.Particles.ParticleEmitterManager;
+    private getParticleEmitter(entityId: number, particleEmitterSet: ParticleEmitterSet):
+        Phaser.GameObjects.Particles.ParticleEmitter {
+        const particleEmitter = this.nonGameObjects[entityId] as Phaser.GameObjects.Particles.ParticleEmitter;
 
-        if (particleEmitterManager) {
-            let particleEmitter;
+        if (!particleEmitter) {
+            if (particleEmitterSet.manager) {
+                const particleEmitterManager = this.gameObjects[particleEmitterSet.manager] as
+                    Phaser.GameObjects.Particles.ParticleEmitterManager;
 
+                let particleEmitter;
+
+                if (this.entityManager.entityHasComponent(entityId, PositionComponent.NAME)) {
+                    const positionSet: PositionSet = this.entityManager
+                        .getComponentDataForEntity(PositionComponent.NAME, entityId);
+
+                    particleEmitter = particleEmitterManager.createEmitter({
+                        x: positionSet.x,
+                        y: positionSet.y,
+                        speed: particleEmitterSet.speed,
+                        blendMode: particleEmitterSet.blendMode
+                    });
+                } else if (this.entityManager.entityHasComponent(entityId, ParticleEmitterFollowingComponent.NAME)) {
+                    const particleEmitterFollowingSet: ParticleEmitterFollowingSet = this.entityManager
+                        .getComponentDataForEntity(ParticleEmitterFollowingComponent.NAME, entityId);
+
+                    particleEmitter = particleEmitterManager.createEmitter({
+                        speed: particleEmitterSet.speed,
+                        scale: particleEmitterSet.scale,
+                        blendMode: particleEmitterSet.blendMode
+                    });
+
+                    if (!this.isGameObjectExistsForEntity(particleEmitterFollowingSet.following)) {
+                        throw new Error('Unable to find following game object for the particle emitter.');
+                    } else {
+                        particleEmitter.startFollow(this.gameObjects[particleEmitterFollowingSet.following]);
+                    }
+                } else {
+                    throw new Error('To create a particle emitter you must at least set one of the following component on your entity: ' +
+                        'Position, ParticleEmitterFollowing.');
+                }
+
+                if (particleEmitter) {
+                    this.nonGameObjects[entityId] = particleEmitter;
+                }
+            }
+        }
+
+        return particleEmitter;
+    }
+
+    private updateParticleEmitter(entityId: number, particleEmitterSet: ParticleEmitterSet) {
+        const particleEmitter = this.getParticleEmitter(entityId, particleEmitterSet);
+
+        if (particleEmitter) {
             if (this.entityManager.entityHasComponent(entityId, PositionComponent.NAME)) {
                 const positionSet: PositionSet = this.entityManager
                     .getComponentDataForEntity(PositionComponent.NAME, entityId);
 
-                particleEmitter = particleEmitterManager.createEmitter({
-                    x: positionSet.x,
-                    y: positionSet.y,
-                    speed: particleEmitterSet.speed,
-                    blendMode: particleEmitterSet.blendMode
-                });
+                particleEmitter
+                    .setPosition(positionSet.x, positionSet.y)
+                    .setScale(particleEmitterSet.scale)
+                    .setSpeed(particleEmitterSet.speed)
+                    .setBlendMode(particleEmitterSet.blendMode)
+                ;
             } else if (this.entityManager.entityHasComponent(entityId, ParticleEmitterFollowingComponent.NAME)) {
                 const particleEmitterFollowingSet: ParticleEmitterFollowingSet = this.entityManager
                     .getComponentDataForEntity(ParticleEmitterFollowingComponent.NAME, entityId);
 
-                particleEmitter = particleEmitterManager.createEmitter({
-                    speed: particleEmitterSet.speed,
-                    scale: particleEmitterSet.scale,
-                    blendMode: particleEmitterSet.blendMode
-                });
+                particleEmitter
+                    .setScale(particleEmitterSet.scale)
+                    .setSpeed(particleEmitterSet.speed)
+                    .setBlendMode(particleEmitterSet.blendMode)
+                ;
 
                 if (!this.isGameObjectExistsForEntity(particleEmitterFollowingSet.following)) {
                     throw new Error('Unable to find following game object for the particle emitter.');
@@ -267,10 +341,6 @@ export class RenderingProcessor implements ProcessorInterface {
             } else {
                 throw new Error('To create a particle emitter you must at least set one of the following component on your entity: ' +
                     'Position, ParticleEmitterFollowing.');
-            }
-
-            if (particleEmitter) {
-                this.nonGameObjects[entityId] = particleEmitter;
             }
         }
     }
