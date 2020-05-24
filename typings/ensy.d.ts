@@ -1,5 +1,5 @@
 // Type definitions for ensy - Entity System JavaScript Library
-// Version: v1.3.0
+// Version: v1.6.0
 
 declare module 'ensy'  {
     export interface ProcessorInterface {
@@ -16,7 +16,7 @@ declare module 'ensy'  {
     export interface Assemblage {
         name: string;
         components: string[];
-        initialState: { [componentId: string]: Component<any> };
+        initialState: { [componentId: string]: any };
     }
 
     export class EntityManager {
@@ -37,9 +37,10 @@ declare module 'ensy'  {
          *
          * @param {string[]} componentIds List of identifiers of the components that compose the new entity
          * @param {number} entityId Optional. Unique identifier of the entity. If passed, no new id will be generated.
+         * @param {{[componentId: string]: any}[]} initialState Optional. Initial State of the Entity
          * @returns {number} Unique identifier of the new entity.
          */
-        createEntity(componentIds: string[], entityId?: number): number;
+        createEntity(componentIds: string[], entityId?: number, initialState?: {[componentId: string]: any}): number;
 
         /**
          * Remove an entity and its instanciated components from the system.
@@ -88,9 +89,10 @@ declare module 'ensy'  {
          *
          * @param {string[]} componentIds List of identifiers of the components to add to the entity.
          * @param {number} entityId Unique identifier of the entity.
+         * @param {{[componentId: string]: any}[]} initialState Optional. Initial State of the Entity
          * @return {EntityManager} this
          */
-        addComponentsToEntity(componentIds: string[], entityId: number): EntityManager;
+        addComponentsToEntity(componentIds: string[], entityId: number, initialState: { [componentId: string]: any }): EntityManager;
 
         /**
          * De-associate a list of components from the entity.
@@ -115,7 +117,7 @@ declare module 'ensy'  {
          *
          * @param {string} componentId Unique identifier of the component.
          * @param {number} entityId Unique identifier of the entity.
-         * @param {BaseComponent<any>} newState object containing the new state to apply.
+         * @param {any} newState object containing the new state to apply.
          * @return {EntityManager} EntityManager
          */
         updateComponentDataForEntity(componentId: string, entityId: number, newState: any): EntityManager;

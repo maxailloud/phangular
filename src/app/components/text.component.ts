@@ -10,7 +10,7 @@ export class TextComponent extends BaseComponent<TextSet> {
             fontFamily: 'monospace',
             align: 'center',
             fontSize: '24pt',
-            color: 'white',
+            color: 'black',
         });
     }
 }

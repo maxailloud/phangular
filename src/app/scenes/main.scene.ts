@@ -32,63 +32,67 @@ export class MainScene extends BaseScene {
     }
 
     public create() {
-        const skyEntityId = this.entityManager.createEntity([DisplayableComponent.NAME, PositionComponent.NAME, ImageComponent.NAME]);
-        this.entityManager.updateComponentDataForEntity(ImageComponent.NAME, skyEntityId, {
-            texture: 'sky',
-        });
-        this.entityManager.updateComponentDataForEntity(PositionComponent.NAME, skyEntityId, {
-            x: 400,
-            y: 300,
+        this.entityManager.createEntity([DisplayableComponent.NAME, PositionComponent.NAME, ImageComponent.NAME],
+            undefined, {
+            [ImageComponent.NAME]: {
+                texture: 'sky',
+            },
+            [PositionComponent.NAME]: {
+                x: 400,
+                y: 300,
+            }
         });
 
-        const logoEntityId = this.entityManager.createEntity([DisplayableComponent.NAME, PositionComponent.NAME, ArcadeComponent.NAME,
-            ImageComponent.NAME, VelocityComponent.NAME, BounceComponent.NAME]);
-        this.entityManager.updateComponentDataForEntity(ImageComponent.NAME, logoEntityId, {
-            texture: 'logo',
-        });
-        this.entityManager.updateComponentDataForEntity(PositionComponent.NAME, logoEntityId, {
-            x: 400,
-            y: 100,
-        });
-        this.entityManager.updateComponentDataForEntity(VelocityComponent.NAME, logoEntityId, {
-            x: 100,
-            y: 200,
+        const logoEntityId = this.entityManager.createEntity([DisplayableComponent.NAME, PositionComponent.NAME,
+            ArcadeComponent.NAME, ImageComponent.NAME, VelocityComponent.NAME, BounceComponent.NAME], undefined, {
+            [ImageComponent.NAME]: {
+                texture: 'logo',
+            },
+            [PositionComponent.NAME]: {
+                x: 400,
+                y: 100,
+            },
+            [VelocityComponent.NAME]: {
+                x: 100,
+                y: 200,
+            }
         });
 
         const redParticleEmitterManagerEntityId = this.entityManager.createEntity([DisplayableComponent.NAME,
-            ParticleEmitterManagerComponent.NAME]);
-        this.entityManager.updateComponentDataForEntity(ParticleEmitterManagerComponent.NAME, redParticleEmitterManagerEntityId, {
-            texture: 'red',
+            ParticleEmitterManagerComponent.NAME], undefined, {
+            [ParticleEmitterManagerComponent.NAME]: {
+                texture: 'red',
+            },
         });
 
-        const redParticleEmitterEntityId = this.entityManager.createEntity([DisplayableComponent.NAME, ParticleEmitterComponent.NAME,
-            ParticleEmitterFollowingComponent.NAME]);
-        this.entityManager.updateComponentDataForEntity(ParticleEmitterComponent.NAME, redParticleEmitterEntityId, {
-            manager: redParticleEmitterManagerEntityId,
-            speed: 100,
-            scale: {start: 1, end: 0},
-            blendMode: Phaser.BlendModes.ADD,
-        });
-        this.entityManager.updateComponentDataForEntity(ParticleEmitterFollowingComponent.NAME, redParticleEmitterEntityId, {
-            following: logoEntityId,
-        });
-
-        const blueParticleEmitterManagerEntityId = this.entityManager.createEntity([DisplayableComponent.NAME, PositionComponent.NAME,
-            ParticleEmitterManagerComponent.NAME]);
-        this.entityManager.updateComponentDataForEntity(ParticleEmitterManagerComponent.NAME, blueParticleEmitterManagerEntityId, {
-            texture: 'blue',
+        this.entityManager.createEntity([DisplayableComponent.NAME, ParticleEmitterComponent.NAME,
+            ParticleEmitterFollowingComponent.NAME], undefined, {
+            [ParticleEmitterComponent.NAME]: {
+                manager: redParticleEmitterManagerEntityId,
+                scale: {start: 1, end: 0},
+            },
+            [ParticleEmitterFollowingComponent.NAME]: {
+                following: logoEntityId,
+            }
         });
 
-        const blueParticleEmitterEntityId = this.entityManager.createEntity([DisplayableComponent.NAME, ParticleEmitterComponent.NAME,
-            PositionComponent.NAME]);
-        this.entityManager.updateComponentDataForEntity(PositionComponent.NAME, blueParticleEmitterEntityId, {
-            x: 400,
-            y: 300,
+        const blueParticleEmitterManagerEntityId = this.entityManager.createEntity([DisplayableComponent.NAME,
+            PositionComponent.NAME, ParticleEmitterManagerComponent.NAME], undefined, {
+            [ParticleEmitterManagerComponent.NAME]: {
+                texture: 'blue',
+            }
         });
-        this.entityManager.updateComponentDataForEntity(ParticleEmitterComponent.NAME, blueParticleEmitterEntityId, {
-            manager: blueParticleEmitterManagerEntityId,
-            speed: 200,
-            blendMode: Phaser.BlendModes.ADD,
+
+        this.entityManager.createEntity([DisplayableComponent.NAME, ParticleEmitterComponent.NAME,
+            PositionComponent.NAME], undefined, {
+            [ParticleEmitterComponent.NAME]: {
+                manager: blueParticleEmitterManagerEntityId,
+                speed: 200,
+            },
+            [PositionComponent.NAME]: {
+                x: 400,
+                y: 300,
+            }
         });
     }
 }
